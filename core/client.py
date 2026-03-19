@@ -1,6 +1,6 @@
 import socket as s
-from HTTP.core.config import ClientConfig as cc
-from HTTP.core.config import GlobalConfig as gc
+from HTTP.config.config import ClientConfig as cc
+from HTTP.config.config import GlobalConfig as gc
 
 
 class Client:
@@ -14,5 +14,6 @@ class Client:
         self.socket.sendall(self.data.encode())
         server_msg = self.socket.recv(self.data_size).decode()
         print(server_msg)
+
 
 
