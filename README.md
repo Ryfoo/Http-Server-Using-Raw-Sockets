@@ -5,14 +5,13 @@
 ---
 
 ## Current State
-
-Basic server-client communication has been established. A socket server can accept a connection, receive raw bytes from a client, and send a response back.
+Building the tcp sockets and establishing the connection using Go (net)
 
 ---
 
 ## What Is This
 
-An HTTP server built entirely from scratch using Python's low-level socket module — no frameworks, no abstractions. The goal is to understand exactly what happens underneath libraries like Flask or Django.
+An HTTP server built entirely from scratch using Python's low-level socket module and Go — no frameworks, no abstractions. The goal is to understand exactly what happens underneath libraries like Flask or Django.
 
 ---
 
@@ -25,6 +24,8 @@ Start with the smallest thing that works. Get one client talking to one server. 
 ## Stack
 
 Python — standard library only. No third-party packages. The `socket` module handles all network I/O, `threading` will handle concurrency, and `json` handles body serialization.
+
+Go — using net package, for certain functionalities and possibly the whole program.
 
 ---
 
@@ -39,7 +40,7 @@ Python — standard library only. No third-party packages. The `socket` module h
 
 ## Goal
 
-A multi-threaded HTTP server with a companion script that spawns multiple simultaneous clients — each connecting, sending a request, and receiving a response — to demonstrate the server handling real concurrent load.
+A multi-threaded HTTP server/request handler with a companion script that spawns multiple simultaneous clients — each connecting, sending a request, and receiving a response — to demonstrate the server handling real concurrent load.
 
 ---
 
