@@ -50,13 +50,23 @@ success_flag_t monitor(socket_fd_t fd, struct sockaddr_in* addr)
         }
         memset(buffer, 0, BUFF_SIZE);
         buffer = strcpy(buffer, "hello mate, welcome to the team\n");
-        if (send(shared_fd, buffer, BUFF_SIZE, 0) < 0) {
+        msg_len_t sent = send(shared_fd, buffer, BUFF_SIZE, 0);
+        if (sent < 0) {
             perror("Error sending data over the common file descriptor\n");
             free(buffer);
             close(shared_fd);
             continue;
         }
-        if(handle_client(shared_fd) < 0) {
+        memset(buffer, 0, BUFF_SIZE);
+        msg_len_t received = recv(shared_fd, buffer, BUFF_SIZE, 0);
+        if (sent < 0) {
+            perror("Error sending data over the common file descriptor\n");
+            free(buffer);
+            close(shared_fd);
+            continue;
+        }
+        success_flag_t s = handle_http_request(buffer);
+        if(s < 0) {
             perror("Error handling the request\n");
             free(buffer);
             close(shared_fd);
@@ -65,5 +75,63 @@ success_flag_t monitor(socket_fd_t fd, struct sockaddr_in* addr)
         free(buffer);
         close(shared_fd);
     }
+    return 0;
+}
+
+
+
+/*
+    Mirrors listening_starter() but for the client.
+    No bind(), no listen() — just socket() + connect().
+*/
+socket_fd_t connection_starter(struct sockaddr_in *addr) {
+    int fd;
+
+    fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+        printf("Error creating socket\n");
+        return -1;
+    }
+
+    if (connect(fd, (struct sockaddr *)addr, sizeof(*addr)) < 0) {
+        printf("Error connecting to server\n");
+        close(fd);
+        return -1;
+    }
+
+    return fd;
+}
+
+/*
+    Mirrors monitor() on the server side.
+    The client side of the active communication loop.
+    sends a request, waits for a response.
+*/
+success_flag_t exchange(int fd, struct sockaddr_in *addr) {
+    char buffer[1024];
+    ssize_t bytes_received;
+
+    /*
+        Send a request to the server.
+        serialize() to build the HTTP message first.
+    */
+    const char *request = "GET / HTTP/1.1\r\nHost: localhost\r\n\r\n";
+    if (send(fd, request, strlen(request), 0) < 0) {
+        printf("Error sending request\n");
+        return -1;
+    }
+
+    /*
+        Wait for the server response.
+        parse() to deserialize the incoming message.
+    */
+    memset(buffer, 0, sizeof(buffer));
+    bytes_received = recv(fd, buffer, sizeof(buffer) - 1, 0);
+    if (bytes_received < 0) {
+        printf("Error receiving response\n");
+        return -1;
+    }
+
+    printf("Server response:\n%s\n", buffer);
     return 0;
 }

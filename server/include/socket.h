@@ -4,7 +4,6 @@
     for better error handling, and additionl features, you want an example ? 
     retransmission for instance.
 */
-#pragma once
 
 #ifndef SOCKET_H
 #define SOCKET_H
@@ -49,6 +48,26 @@ int listening_starter(struct sockaddr_in* addr);
  */
 
 success_flag_t monitor(socket_fd_t fd, struct sockaddr_in* addr);
+
+
+
+
+/*
+    Client-side connection initiator.
+    Symmetric to listening_starter() on the server.
+    calls socket() then connect().
+*/
+int connection_starter(struct sockaddr_in *addr);
+
+/*
+    Client-side communication loop.
+    Symmetric to monitor() on the server.
+    sends requests and receives responses.
+*/
+int exchange(int fd, struct sockaddr_in *addr);
+
+
+
 
 
 // typedef int socket_fd_t;
