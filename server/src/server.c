@@ -1,4 +1,4 @@
-#include "server.h"
+#include "../include/server.h"
 
 /*
     Constants offered by socket.h
@@ -7,7 +7,7 @@
 */
 
 
-int server_engine(char* ip, int port) {
+int server_engine(char* ip, char* port) {
     struct sockaddr_in addr;
     int fd;
     

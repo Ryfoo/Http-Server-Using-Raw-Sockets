@@ -26,7 +26,7 @@
  */
 
 
-void address_init(struct sockaddr_in* addr, char* ip, int port);
+void address_init(struct sockaddr_in* addr, char* ip, char* port);
 /*
  * takes a pointer to sockaddr_in as an argument, starts the listening on a file descriptor.
  * that should be returned.
@@ -43,7 +43,7 @@ int listening_starter(struct sockaddr_in* addr);
  * return -1 on failure, 0 on success.
  */
 
-int monitor(int fd, struct sockaddr* addr);
+int monitor(int fd, struct sockaddr_in* addr);
 
 
 

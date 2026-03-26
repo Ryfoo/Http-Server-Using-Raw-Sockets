@@ -1,7 +1,7 @@
-#include "socket.h"
+#include "../include/socket.h"
 
 
-void address_init(struct sockaddr_in* addr, char* ip, int port) {
+void address_init(struct sockaddr_in* addr, char* ip, char* port) {
     memset(addr, 0, sizeof(*addr));
     addr->sin_family = AF_INET;
     addr->sin_addr.s_addr = inet_addr(ip);
@@ -32,19 +32,18 @@ int listening_starter(struct sockaddr_in* addr)
 }
 
 
-int monitor(int fd, struct sockaddr* addr)
+int monitor(int fd, struct sockaddr_in* addr)
 {
     int shared_fd;
     while(CONNECTION) {
         socklen_t len = sizeof(struct sockaddr_in);
-        shared_fd = accept(fd, addr, &len);
-        char *buffer;
+        shared_fd = accept(fd, (struct sockaddr *) addr, &len);
         if(shared_fd < 0) {
             perror("Error establishing a common file descriptor\n");
             continue;
         }
         printf("The connection has been established\n");
-        buffer = malloc(BUFF_SIZE * sizeof(char));
+        char *buffer = malloc(BUFF_SIZE * sizeof(char));
         if(!buffer){
             perror("Error allocating memory\n");
             close(shared_fd);

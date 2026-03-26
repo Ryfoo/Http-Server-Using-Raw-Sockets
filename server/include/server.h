@@ -11,7 +11,7 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "socket.h"
+#include "../include/socket.h"
 
 // user-defined constants
 
@@ -22,7 +22,7 @@
  * provides error handling
  * returns -1 on failure, 0 on success
  */
-int server_engine(char* ip, int port);
+int server_engine(char* ip, char* port);
 
 
 #endif
