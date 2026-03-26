@@ -46,9 +46,9 @@ Starting with the smallest thing that works. Getting one client talking to one s
 
 **Python** — standard library only. No third-party packages. The `socket` module handles all network I/O, `threading` will handle concurrency, and `json` handles body serialization.
 
-**Go** — using net package, for certain functionalities and possibly the whole program.
+**Go** — using net package, for stress-testing, and  orchestration.
 
-**C** — Just being C, the mighty (context-relative not absolutely), it's powerful enough, and using it is as using the System's System Calls API itself (kind of).
+**C** — just being C, the mighty (context-relative not absolutely), it's powerful enough, and using it is as using the System's System Calls API itself (kind of).
 
 ---
 
@@ -65,14 +65,19 @@ Starting with the smallest thing that works. Getting one client talking to one s
 
 A multi-threaded HTTP/1.0 server/request handler with a companion script that spawns multiple simultaneous clients — each connecting, sending a request, and receiving a response — to demonstrate the server handling real concurrent load.
 
-Why not HTTP/1.1, just shut up and look out how hard it's to implement for a beginner like me. you want real talk ?
-HTTP/1.1 is a modern protocol that relies on a consistent connection between two endpoint, instead of establishing a connection on each transmission (i.e, request), one connection can be used to handle different requests from the same machine.
+Why not HTTP/1.1, just read about it and search for how hard it's to implement for a beginner like me. you want real talk ?
+HTTP/1.1 is a modern protocol that relies on a consistent connection between two endpoints, instead of establishing a connection on each transmission (i.e, request), one connection can be used to handle different requests from the same machine, this will lead to reoccuring issues.
+
+what makes HTTP/1.1 significantly harder :
+- Detect when a request ends.
+- Decide whether to keep the connection open.
+- Handle timeouts.
 
 ---
 
 ## Important Design Decisions
 
-Not much decisions were taken, you might be wondering why ? I will tell you in a minute :
+Not much decisions were taken, you might be wondering why, I will tell you in a minute :
 
 - firstly and most importantly, I can't take decisions by myself.
 - Secondly, most of the implementations are strict pre-agreed-upon protocols that were designed by better engineers (than you, not me) to follow certain rules and constraints. However, there is one important thing to note, the server follows HTTP/1.0 rather than the modern HTTP/1.1, the key distinction was discussed earlier.
