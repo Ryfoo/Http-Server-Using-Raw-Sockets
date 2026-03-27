@@ -1,3 +1,6 @@
+![Banner](assets/banner.png)
+
+
 # Scratchy — HTTP/1.0 Request Handler over Raw TCP/IPv4 Sockets
 
 *Part of the Scratchy series: building foundational software from first principles, one layer at a time.*
