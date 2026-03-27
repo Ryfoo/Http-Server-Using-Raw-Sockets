@@ -2,17 +2,20 @@
 
 /*
     Mirrors server_engine() on the client side.
-    Instead of bind() + listen() + accept(),
-    the client only needs socket() + connect().
+    Instead of bind() -> listen() -> accept(),
+    the client only needs socket() -> connect().
 */
-success_flag_t client_engine(string ip, string port) {
+success_flag_t client_engine(char* ip, char* port) {
+    /*
+        Note that sockaddr_in data type is heavily used in that code
+        if you can't figure out what type of data it carries,
+        it's advised to use the manual
+    */
     struct sockaddr_in addr;
     int fd;
 
     /*
-        Reuse the same address_init() from the server side —
-        the struct sockaddr preparation is identical,
-        same ip, same port, same family.
+        use address_init() from socket.h
     */
     address_init(&addr, ip, port);
 
