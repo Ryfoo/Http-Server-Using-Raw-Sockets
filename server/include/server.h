@@ -1,8 +1,9 @@
 /*
-    socket.h
-    this header file provides wrappers for the pre-existing socket library
-    for better error handling, and additionl features, you want an example ? 
-    retransmission for instance.
+    server.h
+    this header file provides the main beating heart of the server.
+    a function that takes two strings: the ip and the port, in order to 
+    establish sockets and launch a listening operation on a specified file descriptor
+    types are defined at server/include/common.h
 */
 #pragma once
 
@@ -26,7 +27,6 @@
  * provides error handling
  * returns -1 on failure, 0 on success
  */
-success_flag_t server_engine(string ip, string port);
+success_flag_t server_engine(char* ip, char* port);
 
-typedef char* string;
 #endif
