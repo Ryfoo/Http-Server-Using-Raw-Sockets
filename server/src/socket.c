@@ -122,7 +122,7 @@ n_bytes_t exchange(
     // Demo, here where the serialization should take place.
     // http_req instance -> serialize to shareable data -> send
     http_request_t req;
-    if(request_constructor(&req, method, uri, headers, body) < 0) 
+    if(request_init(&req, method, uri, headers, body) < 0) 
     {
         perror("Error creating an HTTP request\n");
         return FAILURE;

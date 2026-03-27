@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <string.h>
 #include "../include/serializer.h"
 
 success_flag_t serialize(http_request_t req, char* buffer, size_t buffer_size) {
@@ -14,7 +12,10 @@ success_flag_t serialize(http_request_t req, char* buffer, size_t buffer_size) {
     // Request line: METHOD URI VERSION\r\n
     written = snprintf(buffer + offset, buffer_size - offset,
                        "%s %s %s\r\n",
-                       req.req_line->method, req.req_line->uri, req.req_line);
+                       req.req_line->method,
+                       req.req_line->uri,
+                       req.req_line->http_version
+                    );
 
     if (written < 0 || (size_t)written >= buffer_size - offset)
         return FAILURE;
@@ -22,11 +23,11 @@ success_flag_t serialize(http_request_t req, char* buffer, size_t buffer_size) {
     offset += written;
 
     // Headers
-    for (size_t i = 0; i < HEADERS_LEN; i++) {
+    for (size_t i = 0; i < req.head->headers_counter; i++) {
         written = snprintf(buffer + offset, buffer_size - offset,
                            "%s: %s\r\n",
-                           req.headers[i].name,
-                           req.headers[i].value
+                           req.head->headers[i].name, 
+                           req.head->headers[i].value
                         );
 
         if (written < 0 || (size_t)written >= buffer_size - offset)
@@ -45,8 +46,8 @@ success_flag_t serialize(http_request_t req, char* buffer, size_t buffer_size) {
 
     // Body (optional)
     if (req.body) {
-        written = snprintf(buffer + offset, buffer_size - offset,
-                           "%s", req.body);
+        memcpy(buffer + offset, req.body, req.body_size);
+        offset += req.body_size;
 
         if (written < 0 || (size_t)written >= buffer_size - offset)
             return FAILURE;
@@ -56,6 +57,5 @@ success_flag_t serialize(http_request_t req, char* buffer, size_t buffer_size) {
 
     return SUCCESS;
 }
-
 
 
