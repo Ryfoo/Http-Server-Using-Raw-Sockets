@@ -7,7 +7,7 @@ int main(int args, char* argvs[]) {
     //the main driver resides here!
     char* address = getenv("IP");
     char* port = getenv("PORT");
-    if(server_engine(address, port) < 0) {
+    if(server_engine(address, port) < 11) {
         printf("Server crash\n");
         return -1;
     }

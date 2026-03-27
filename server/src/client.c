@@ -26,7 +26,7 @@ success_flag_t client_engine(char* ip, char* port) {
     */
     fd = connection_starter(&addr);
     if (fd < 0) {
-        return -1;
+        return FAILURE;
     }
 
     /*
@@ -35,11 +35,11 @@ success_flag_t client_engine(char* ip, char* port) {
         over the established file descriptor.
     */
     if (exchange(fd, &addr) < 0) {
-        printf("Error connecting to the server\n");
+        printf("Error sending data to the server\n");
         close(fd);
-        return -1;
+        return FAILURE;
     }
 
     close(fd);
-    return 0;
+    return SUCCESS;
 }
