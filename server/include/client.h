@@ -19,6 +19,14 @@
     Initializes a connection to a remote server.
     Symmetric to server_engine() but connects instead of listens.
 */
-success_flag_t client_engine(char* ip, char* port);
+success_flag_t client_engine(
+                                char* ip, 
+                                char* port,
+                                char* method,
+                                char* uri, 
+                                header_t headers[HEADERS_LEN],
+                                size_t headers_count,
+                                char* body
+                            );
 
 #endif

@@ -5,14 +5,23 @@
     Instead of bind() -> listen() -> accept(),
     the client only needs socket() -> connect().
 */
-success_flag_t client_engine(char* ip, char* port) {
+success_flag_t client_engine(
+                            char* ip, 
+                            char* port,
+                            char* method,
+                            char* uri, 
+                            header_t headers[HEADERS_LEN],
+                            size_t headers_count,
+                            char* body
+                        ) 
+{
     /*
         Note that sockaddr_in data type is heavily used in that code
         if you can't figure out what type of data it carries,
         it's advised to use the manual
     */
     struct sockaddr_in addr;
-    int fd;
+    socket_fd_t fd;
 
     /*
         use address_init() from socket.h
@@ -26,19 +35,29 @@ success_flag_t client_engine(char* ip, char* port) {
     */
     fd = connection_starter(&addr);
     if (fd < 0) {
+        perror("Error establishing connection\n");
         return FAILURE;
     }
 
     /*
         Heart of the client — symmetric to monitor() on the server.
         sends requests and receives responses
-        over the established file descriptor.
+        using the server's address.
     */
-    if (exchange(fd, &addr) < 0) {
+    if (exchange(
+                    fd, 
+                    &addr, 
+                    method, 
+                    uri, 
+                    headers,
+                    headers_count,
+                    body    
+                ) != SUCCESS) {
         printf("Error sending data to the server\n");
         close(fd);
         return FAILURE;
     }
+
 
     close(fd);
     return SUCCESS;
