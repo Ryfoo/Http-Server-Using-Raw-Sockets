@@ -65,7 +65,7 @@ void monitor(socket_fd_t fd, struct sockaddr_in* addr);
  * follows the options AF_INET, SOCK_STREAM (man socket for more details).
  * returns the file descriptor of the client, -1 on failure.
  */
-socket_fd_t connection_starter(struct sockaddr_in *addr);
+socket_fd_t connection_starter(const struct sockaddr_in *addr);
 
 /*
  * takes as arguments :
@@ -76,12 +76,13 @@ socket_fd_t connection_starter(struct sockaddr_in *addr);
  * return -1 on failure, 0 on success.
  */
 n_bytes_t exchange(
-                        int fd, 
-                        struct sockaddr_in *addr, 
-                        char* method, char* uri, 
+                        const socket_fd_t fd, 
+                        const struct sockaddr_in *addr, 
+                        const char* method, 
+                        const char* uri, 
                         header_t headers[HEADERS_LEN],
-                        size_t headers_count, 
-                        char* body
+                        size_t headers_count,
+                        const char* body
                     );
 
 
