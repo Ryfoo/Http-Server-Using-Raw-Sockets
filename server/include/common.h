@@ -8,8 +8,8 @@
 #define FAILURE -1
 #define SUCCESS 0
 
-#define BUFF_SIZE 4096
-#define RECV_BUFFER_SIZE 8192
+#define SEND_BUFF_SIZE 4096
+#define RECV_BUFF_SIZE 8192
 
 #define SHORT_LENGTH 32
 #define HEADERS_LEN 32
