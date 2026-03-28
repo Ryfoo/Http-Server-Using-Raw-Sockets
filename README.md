@@ -8,10 +8,7 @@
 ---
 
 ## Current State
-(this section is subject to consistent change)
-Building the the http models (request and response) following the HTTP protocol rules and restrictions,
-and the connection handlers
-next step : routers and the routing system.
+implementing the routing model  (patching -> extracting -> dispatch).
 
 ---
 
