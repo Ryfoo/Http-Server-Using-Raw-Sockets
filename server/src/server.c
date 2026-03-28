@@ -40,11 +40,9 @@ success_flag_t server_engine(char* ip, char* port) {
     
     */
 
-    if(monitor(fd, &addr) < 0) {
-        printf("Error establishing a stable connection to receive requests\n");
-        close(fd);
-        return -1;
-    }
+    monitor(fd, &addr);
+    
+    
     close(fd);
     return 0;
 }
