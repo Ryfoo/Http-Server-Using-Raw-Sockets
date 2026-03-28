@@ -5,7 +5,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-success_flag_t parse(char* raw, http_request_t* req);
+success_flag_t parse(const char* raw, http_request_t* req);
 
 
 #endif

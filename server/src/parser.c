@@ -1,7 +1,7 @@
 #include "../include/parser.h"
 
 
-success_flag_t parse(char *raw, http_request_t *req) {
+success_flag_t parse(const char *raw, http_request_t *req) {
     if (!raw || !req) return FAILURE;
 
     char *line, *saveptr;
