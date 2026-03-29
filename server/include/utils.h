@@ -6,5 +6,7 @@
 
 // Loading envrionmental variables
 void load_env(const char *filename);
+char* load_file(const char* filename, long* out_size);
+
 
 #endif
