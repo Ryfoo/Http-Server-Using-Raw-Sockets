@@ -1,12 +1,14 @@
 #include "../include/http.h"
 
 
-success_flag_t request_init(http_request_t *req, 
+success_flag_t request_init(
+                            http_request_t *req, 
                             char* method, 
                             char* uri, 
                             header_t headers[HEADERS_LEN], 
                             size_t headers_count,
-                            char* body) 
+                            char* body
+                        ) 
 {
     //allocating header.
     headers_list_t* hd = NULL;
@@ -79,3 +81,28 @@ success_flag_t request_init(http_request_t *req,
 
 
 
+success_flag_t handle_http_request(
+                                    const char* recv_buffer,
+                                    char* send_buffer, 
+                                    http_request_t* req,
+                                    http_response_t* res
+                                )
+{
+    if(parse(recv_buffer, req) != SUCCESS)
+    {
+        
+        return FAILURE;
+    }
+    
+    if(routing_handler(req, &res) != SUCCESS)
+    {
+        return FAILURE;
+    }
+    
+    memset(send_buffer, 0, SEND_BUFF_SIZE);
+    if(serialize_res(send_buffer, res) != SUCCESS)
+    {
+        return FAILURE;
+    }
+
+}
