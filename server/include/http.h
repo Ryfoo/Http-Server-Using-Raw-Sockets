@@ -30,7 +30,7 @@ success_flag_t request_init(
                             const char* body
                         );
 success_flag_t handle_http_request( 
-                                    const char* recv_buffer,
+                                    char* recv_buffer,
                                     char* send_buffer,
                                     http_request_t* req,
                                     http_response_t* res

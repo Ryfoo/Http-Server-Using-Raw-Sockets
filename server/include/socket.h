@@ -31,7 +31,7 @@
  * follows the parameters AF_INET, SOCK_STREAM (man socket for more details).
  * to set the options according to the IPv4 protocol.
  */
-void address_init(struct sockaddr_in* addr, char* ip, char* port);
+void address_init(struct sockaddr_in* addr, char* port);
 
 
 /*

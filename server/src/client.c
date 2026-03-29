@@ -26,7 +26,7 @@ success_flag_t client_engine(
     /*
         use address_init() from socket.h
     */
-    address_init(&addr, ip, port);
+    address_init(&addr, port);
 
     /*
         connection_starter() is the client equivalent of listening_starter().

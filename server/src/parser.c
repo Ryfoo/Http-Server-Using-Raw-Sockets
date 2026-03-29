@@ -1,24 +1,30 @@
 #include "../include/parser.h"
 
 
-success_flag_t parse_req(const char *raw, http_request_t *req) {
+success_flag_t parse_req(char *raw, http_request_t *req) {
     if (!raw || !req) return FAILURE;
 
     char *line, *saveptr;
     
     // Request line
     line = strtok_r((char*) raw,"\r\n", &saveptr);
-    if (!line) return FAILURE;
+    if (!line) {
+        free(raw);
+        return FAILURE;
+    } 
 
     req->req_line = malloc(sizeof(request_line_t));
-    if (!req->req_line) return FAILURE;
+    if (!req->req_line) {
+        free(raw);
+        return FAILURE; 
+    }
 
     if (sscanf(line, "%31s %255s %15s",
                req->req_line->method,
                req->req_line->uri,
                req->req_line->http_version) != 3) 
     {
-        free(req->req_line);
+        free(req->req_line); free(raw);
         return FAILURE;
     }
 
@@ -26,6 +32,7 @@ success_flag_t parse_req(const char *raw, http_request_t *req) {
     req->head = malloc(sizeof(headers_list_t));
     if (!req->head) {
         free(req->req_line);
+        free(raw);
         return FAILURE;
     }
     req->head->headers_counter = 0;
@@ -54,6 +61,7 @@ success_flag_t parse_req(const char *raw, http_request_t *req) {
         req->body = malloc(req->body_size + 1);
         if (!req->body) {
             free(req->head); free(req->req_line);
+            free(raw);
             return FAILURE;
         }
         strcpy(req->body, body_start);
@@ -61,7 +69,7 @@ success_flag_t parse_req(const char *raw, http_request_t *req) {
         req->body = NULL;
         req->body_size = 0;
     }
-
+    free(raw);
     return SUCCESS;
 }
 

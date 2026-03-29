@@ -1,10 +1,10 @@
 #include "../include/socket.h"
 
 
-void address_init(struct sockaddr_in* addr, char* ip, char* port) {
+void address_init(struct sockaddr_in* addr, char* port) {
     memset(addr, 0, sizeof(*addr));
     addr->sin_family = AF_INET;
-    addr->sin_addr.s_addr = inet_addr((const char*)ip);
+    addr->sin_addr.s_addr = INADDR_ANY;
     addr->sin_port = (in_port_t) htons((u_int16_t)atoi((const char*)port));
 }
 
@@ -71,12 +71,11 @@ void monitor(socket_fd_t host_fd, struct sockaddr_in* addr, int8_t running)
             perror("Error handling the request\n");
             goto cleanup;
         }
-        if(send(transfer_fd, send_buffer, SEND_BUFF_SIZE, 0) < 0)
+        if(send(transfer_fd, send_buffer, strlen(send_buffer), 0) < 0)
         {
             perror("Error sending data\n");
             goto cleanup;
         }
-        free(recv_buffer);
         free(send_buffer);
         
 
@@ -94,8 +93,10 @@ void monitor(socket_fd_t host_fd, struct sockaddr_in* addr, int8_t running)
 
         close(transfer_fd);
         
+
+        continue;
         cleanup:
-            free(recv_buffer);
+
             free(send_buffer);
 
             free(req->req_line);

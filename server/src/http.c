@@ -85,7 +85,7 @@ success_flag_t request_init(
 
 
 success_flag_t handle_http_request(
-                                    const char* recv_buffer,
+                                    char* recv_buffer,
                                     char* send_buffer, 
                                     http_request_t* req,
                                     http_response_t* res
@@ -109,7 +109,7 @@ success_flag_t handle_http_request(
     }
     
     memset(send_buffer, 0, SEND_BUFF_SIZE);
-    if(serialize_res(send_buffer, res, SEND_BUFF_SIZE) != SUCCESS)
+    if(serialize_res(send_buffer, res, RECV_BUFF_SIZE) != SUCCESS)
     {
         return FAILURE;
     }

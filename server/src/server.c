@@ -17,7 +17,7 @@ success_flag_t server_engine(char* ip, char* port, int8_t running) {
         address_init is a user-defind function
         for modulartiy, readability and portability
     */
-    address_init(&addr, ip, port);
+    address_init(&addr, port);
 
     /*
         connection starter()
