@@ -8,37 +8,39 @@ success_flag_t make_404_response(http_response_t* res)
     
     return FAILURE;
 }
-success_flag_t index_handler(http_request_t req, http_response_t* res)
+success_flag_t index_handler(http_request_t* req, http_response_t* res)
 {
-    if (!res) return make_404_response(res);
 
-    FILE* f = fopen("../../static/index.html", "r");
-    if (!f)
+
+    long file_size;
+    char* content = malloc(SEND_BUFF_SIZE);
+    if(!content)
     {
         return make_404_response(res);
     }
+    content = load_file("../static/index.html", &file_size);
 
-    char* buffer = malloc(RECV_BUFF_SIZE);
-    if (!buffer)
-    {
-        fclose(f);
-        return make_response(res);
+    if (content) {
+        res->res_line->status = 200;
+        strcpy(res->res_line->reason, "OK");
+        strcpy(res->res_line->http_version, "HTTP/1.0");
+        res->head->headers[0] = (header_t){
+            .name = "Content-type",
+            .value = "text/html"
+        };
+        res->head->headers_counter = 1;
+        res->body = malloc(SEND_BUFF_SIZE);
+        if(!res->body)
+        {
+            return make_404_response(res);
+        }
+        strcpy(res->body, content);
+        res->body_size = (size_t) file_size;
+        free(content);
+        return SUCCESS;
     }
 
-    size_t bytes_read = fread(buffer, 1, RECV_BUFF_SIZE - 1, f);
-    buffer[bytes_read] = '\0';
+    
 
-    fclose(f);
-
-    // Build HTTP response
-    res->res_line->status = 200;
-    strcpy(res->res_line->reason, "OK");
-    res->head->headers[0] = (header_t){
-        .name = "Content-type",
-        .value = "text/html"
-    };
-    res->body = buffer;
-    res->body_size = bytes_read;
-
-    return SUCCESS;
+    return make_404_response(res);
 }
