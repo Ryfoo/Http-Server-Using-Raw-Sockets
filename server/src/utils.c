@@ -29,3 +29,32 @@ void load_env(const char *filename)
 
     fclose(file);
 }
+
+
+
+
+char* load_file(const char* filename, long* out_size) {
+    FILE* f = fopen(filename, "rb"); // "rb" is safer for cross-platform binary/text
+    if (f == NULL) return NULL;
+
+    // 1. Find file size
+    fseek(f, 0, SEEK_END);
+    long size = ftell(f);
+    rewind(f);
+
+    // 2. Allocate memory (+1 for null terminator if serving as a string)
+    char* buffer = malloc(size + 1);
+    if (buffer == NULL) {
+        fclose(f);
+        return NULL;
+    }
+
+    // 3. Read the file into the buffer
+    size_t bytes_read = fread(buffer, 1, size, f);
+    buffer[bytes_read] = '\0'; // Null terminate
+
+    fclose(f);
+    
+    if (out_size) *out_size = (long)bytes_read;
+    return buffer;
+}
