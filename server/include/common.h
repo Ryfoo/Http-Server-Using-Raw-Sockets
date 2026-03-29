@@ -18,6 +18,8 @@
 
 #define BODY_SIZE 8192  
 
+
+typedef int8_t success_flag_t;
 typedef int8_t socket_fd_t;
 typedef int8_t success_flag_t;
 typedef int16_t n_bytes_t;
@@ -38,6 +40,14 @@ typedef struct
 
 } request_line_t;
 
+typedef struct
+{
+    char http_version[SHORT_LENGTH];
+    int8_t status;
+    char reason[SHORT_LENGTH];
+    
+}status_line_t;
+
 typedef struct 
 {
     header_t headers[HEADERS_LEN];
@@ -52,5 +62,16 @@ typedef struct
     size_t body_size;
 
 }http_request_t;
+
+
+typedef struct 
+{
+    status_line_t* res_line;
+    headers_list_t* head;
+    char* body;
+    size_t body_size;
+
+}http_response_t;
+
 
 #endif
