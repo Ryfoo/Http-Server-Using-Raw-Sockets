@@ -8,15 +8,17 @@
 ---
 
 ## Current State
-- Implementing the routing model  (patching -> extracting -> dispatch).
-- Ensuring that the minimal routing system (serves index, services, ...) works perfectly before scaling.
+- Introducing multithreading using epoll(), to handle concurrent users.
+- a full pdf file will be provided to explain the whole process, for those who want to learn.
+- a much more complex routing system will be implemented.
+  
  
 
 ---
 
 ## What Is This
 
-An HTTP server built entirely from scratch using C libraries, one level above Linux system calls API.
+An HTTP server built entirely from scratch using C libraries, one level above the POSIX API.
 the prototype is offered in Python for better code readability and comprehension, Go is used for orchestration and stress-testing.
 OMGG! I love Goroutines, they are a very great tool to introduce and build concurrent programs without the burden of dealing with threads logic and race conditions (hopefully), as the Go's compiler will handle all the mapping's work by itself.
 
