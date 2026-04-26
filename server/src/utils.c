@@ -1,6 +1,10 @@
 #include "../include/utils.h"
+#include <strings.h>
+#include <time.h>
+#include <stdio.h>
 
-void load_env(const char *filename) 
+
+void load_env(const char *filename)
 {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -10,51 +14,74 @@ void load_env(const char *filename)
 
     char line[256];
     while (fgets(line, sizeof(line), file)) {
-        // Skip comments and empty lines
         if (line[0] == '#' || line[0] == '\n') continue;
-
-        // Remove trailing newline
         line[strcspn(line, "\n")] = 0;
 
-        // Split on '='
         char *eq = strchr(line, '=');
         if (!eq) continue;
 
-        *eq = '\0';              // split into key and value
+        *eq = '\0';
         char *key   = line;
         char *value = eq + 1;
-
-        if(!setenv(key, value, 1)) continue;  // load into process environment
+        setenv(key, value, 1);
     }
 
     fclose(file);
 }
 
 
+char* load_file(const char* filename, long* out_size)
+{
+    FILE* f = fopen(filename, "rb");
+    if (!f) return NULL;
 
-
-char* load_file(const char* filename, long* out_size) {
-    FILE* f = fopen(filename, "rb"); // "rb" is safer for cross-platform binary/text
-    if (f == NULL) return NULL;
-
-    // 1. Find file size
-    fseek(f, 0, SEEK_END);
+    if (fseek(f, 0, SEEK_END) != 0) { fclose(f); return NULL; }
     long size = ftell(f);
+    if (size < 0) { fclose(f); return NULL; }
     rewind(f);
 
-    // 2. Allocate memory (+1 for null terminator if serving as a string)
-    char* buffer = malloc(size + 1);
-    if (buffer == NULL) {
-        fclose(f);
-        return NULL;
-    }
+    char* buffer = malloc((size_t)size + 1);
+    if (!buffer) { fclose(f); return NULL; }
 
-    // 3. Read the file into the buffer
-    size_t bytes_read = fread(buffer, 1, size, f);
-    buffer[bytes_read] = '\0'; // Null terminate
-
+    size_t bytes_read = fread(buffer, 1, (size_t)size, f);
+    buffer[bytes_read] = '\0';
     fclose(f);
-    
+
     if (out_size) *out_size = (long)bytes_read;
     return buffer;
+}
+
+
+const char* header_get(const headers_list_t* hl, const char* name)
+{
+    if (!hl || !name) return NULL;
+    for (size_t i = 0; i < hl->headers_counter; i++) {
+        if (strcasecmp(hl->headers[i].name, name) == 0) {
+            return hl->headers[i].value;
+        }
+    }
+    return NULL;
+}
+
+
+void header_set(headers_list_t* hl, const char* name, const char* value)
+{
+    if (!hl || !name || !value) return;
+    if (hl->headers_counter >= HEADERS_LEN) return;
+    header_t* h = &hl->headers[hl->headers_counter++];
+    strncpy(h->name,  name,  HEADER_NAME_LENGTH  - 1);
+    h->name[HEADER_NAME_LENGTH - 1] = '\0';
+    strncpy(h->value, value, HEADER_VALUE_LENGTH - 1);
+    h->value[HEADER_VALUE_LENGTH - 1] = '\0';
+}
+
+
+void http_date_now(char* buffer, size_t buffer_size)
+{
+    if (!buffer || buffer_size < 30) return;
+    time_t now = time(NULL);
+    struct tm gmt;
+    gmtime_r(&now, &gmt);
+    /* IMF-fixdate, e.g. "Sun, 06 Nov 1994 08:49:37 GMT" */
+    strftime(buffer, buffer_size, "%a, %d %b %Y %H:%M:%S GMT", &gmt);
 }

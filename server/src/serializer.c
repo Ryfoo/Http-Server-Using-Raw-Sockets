@@ -1,104 +1,81 @@
 #include "../include/serializer.h"
+#include <stdio.h>
+#include <string.h>
 
-success_flag_t serialize_req(char* buffer, http_request_t* req, size_t buffer_size) {
-    size_t offset = 0;
-    n_bytes_t written;
 
-    if (!buffer || buffer_size == 0)
-        return FAILURE;
-    
-    buffer[0] = '\0';
+n_bytes_t serialize_req_head(char* buf, size_t cap, const http_request_t* req)
+{
+    if (!buf || cap == 0 || !req || !req->req_line) return FAILURE;
 
-    // Request line: METHOD URI VERSION\r\n
-    written = snprintf(buffer + offset, buffer_size - offset,
-                       "%s %s %s\r\n",
-                       req->req_line->method,
-                       req->req_line->uri,
-                       req->req_line->http_version
-                       );
-    if (written < 0 || (size_t)written >= buffer_size - offset)
-        return FAILURE;
-    offset += written;
+    size_t off = 0;
+    int w;
 
-    // Headers
-    for (size_t i = 0; i < req->head->headers_counter; i++) {
-        written = snprintf(buffer + offset, buffer_size - offset,
-                           "%s: %s\r\n",
-                           req->head->headers[i].name,
-                           req->head->headers[i].value
-                           );
-        if (written < 0 || (size_t)written >= buffer_size - offset)
-            return FAILURE;
-        offset += written;
+    w = snprintf(buf + off, cap - off, "%s %s %s\r\n",
+                 req->req_line->method,
+                 req->req_line->uri,
+                 req->req_line->http_version);
+    if (w < 0 || (size_t)w >= cap - off) return FAILURE;
+    off += (size_t)w;
+
+    if (req->head) {
+        for (size_t i = 0; i < req->head->headers_counter; i++) {
+            w = snprintf(buf + off, cap - off, "%s: %s\r\n",
+                         req->head->headers[i].name,
+                         req->head->headers[i].value);
+            if (w < 0 || (size_t)w >= cap - off) return FAILURE;
+            off += (size_t)w;
+        }
     }
 
-    // Empty line between headers and body
-    written = snprintf(buffer + offset, buffer_size - offset, "\r\n");
-    if (written < 0 || (size_t)written >= buffer_size - offset)
-        return FAILURE;
-    offset += written;
+    w = snprintf(buf + off, cap - off, "\r\n");
+    if (w < 0 || (size_t)w >= cap - off) return FAILURE;
+    off += (size_t)w;
 
-    // Body (optional)
-    if (req->body && req->body_size > 0) {
-        if (req->body_size >= buffer_size - offset)  // Fix 1: correct bounds check before memcpy
-            return FAILURE;
-        memcpy(buffer + offset, req->body, req->body_size);
-        offset += req->body_size;
-        buffer[offset] = '\0';                      // Fix 2: null-terminate after body
-    }
-
-    return SUCCESS;
+    return (n_bytes_t)off;
 }
 
 
-#include "../include/serializer.h"
+n_bytes_t serialize_res_head(char* buf, size_t cap, const http_response_t* res)
+{
+    if (!buf || cap == 0 || !res || !res->res_line) return FAILURE;
 
-success_flag_t serialize_res(char* buffer, http_response_t* res, size_t buffer_size) {
-    size_t offset = 0;
-    n_bytes_t written;
+    size_t off = 0;
+    int w;
 
-    if (!buffer || buffer_size == 0)
-        return FAILURE;
+    w = snprintf(buf + off, cap - off, "%s %d %s\r\n",
+                 res->res_line->http_version,
+                 res->res_line->status,
+                 res->res_line->reason);
+    if (w < 0 || (size_t)w >= cap - off) return FAILURE;
+    off += (size_t)w;
 
-    buffer[0] = '\0';
-
-    // Status line: VERSION STATUS_CODE REASON\r\n
-    written = (n_bytes_t)snprintf(buffer + offset, buffer_size - offset,
-                       "%s %d %s\r\n",
-                       res->res_line->http_version,
-                       res->res_line->status,
-                       res->res_line->reason
-                       );
-    if (written < 0 || (size_t)written >= buffer_size - offset)
-        return FAILURE;
-    offset += written;
-
-    // Headers
-    for (size_t i = 0; i < res->head->headers_counter; i++) {
-        written = snprintf(buffer + offset, buffer_size - offset,
-                           "%s: %s\r\n",
-                           res->head->headers[i].name,
-                           res->head->headers[i].value
-                           );
-        if (written < 0 || (size_t)written >= buffer_size - offset)
-            return FAILURE;
-        offset += written;
+    if (res->head) {
+        for (size_t i = 0; i < res->head->headers_counter; i++) {
+            w = snprintf(buf + off, cap - off, "%s: %s\r\n",
+                         res->head->headers[i].name,
+                         res->head->headers[i].value);
+            if (w < 0 || (size_t)w >= cap - off) return FAILURE;
+            off += (size_t)w;
+        }
     }
 
-    // Empty line between headers and body
-    written = snprintf(buffer + offset, buffer_size - offset, "\r\n");
-    if (written < 0 || (size_t)written >= buffer_size - offset)
-        return FAILURE;
-    offset += written;
+    w = snprintf(buf + off, cap - off, "\r\n");
+    if (w < 0 || (size_t)w >= cap - off) return FAILURE;
+    off += (size_t)w;
 
-    // Body (optional)
-    if (res->body && res->body_size > 0) {
-        if (res->body_size >= buffer_size - offset)
-            return FAILURE;
-        memcpy(buffer + offset, res->body, res->body_size);
-        offset += res->body_size;
-        buffer[offset] = '\0';
+    return (n_bytes_t)off;
+}
+
+
+n_bytes_t serialize_req(char* buf, size_t cap, const http_request_t* req)
+{
+    n_bytes_t head = serialize_req_head(buf, cap, req);
+    if (head < 0) return FAILURE;
+
+    if (req->body && req->body_size > 0) {
+        if ((size_t)head + req->body_size >= cap) return FAILURE;
+        memcpy(buf + head, req->body, req->body_size);
+        head = (n_bytes_t)((size_t)head + req->body_size);
     }
-
-    return SUCCESS;
+    return head;
 }
