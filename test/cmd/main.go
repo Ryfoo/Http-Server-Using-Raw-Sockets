@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	HOST        = "192.168.1.23:8080"
+	HOST        = "127.0.0.1:8080"
 	PATH        = "/index.html"
-	CLIENTS     = 10
+	CLIENTS     = 1000
 	REQUESTS    = 50
 	CONCURRENCY = 100
 )
